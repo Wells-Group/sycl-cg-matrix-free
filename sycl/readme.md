@@ -31,9 +31,9 @@ Instructions to install Intel's LLVM-Based SYCL can be found [here](https://inte
 ### CPUs
 
 ```bash
-export CXX=clang++
-mkdir build
-cd build
+export CXX=dpcpp
+mkdir build_llvm
+cd build_llvm
 cmake -DSYCL_IMPL=LLVM -DSYCL_TARGET=CPU ..
 make 
 ```
