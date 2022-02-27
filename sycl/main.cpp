@@ -12,29 +12,25 @@ using namespace std::chrono;
 
 template <typename T> static void bench_axpy(benchmark::State &state) {
 
-  cl::sycl::queue q{sycl::default_selector()};
+  cl::sycl::queue queue{sycl::default_selector()};
 
   const std::size_t work_group_size = state.range(0);
   const std::size_t global_size = state.range(1);
 
-  T *x = kernel::init_vector<T>(q, global_size, value);
-  T *y = kernel::init_vector<T>(q, global_size, value);
+  T *x = kernel::init_vector<T>(queue, global_size, value);
+  T *y = kernel::init_vector<T>(queue, global_size, value);
   T alpha = 1.;
   T beta = 0.5;
-  // T* z = kernel::init_vector<T>(q, 1e8, value);
 
   for (auto _ : state) {
-    // q.fill<T>(z, beta++, 1e8).wait();
     auto start = high_resolution_clock::now();
-    kernel::axpy(q, global_size, alpha, beta, x, y, work_group_size).wait();
+    kernel::axpy(queue, global_size, alpha, beta, x, y, work_group_size).wait();
     auto end = high_resolution_clock::now();
     double t = duration_cast<duration<double>>(end - start).count();
     state.SetIterationTime(t);
-    // benchmark::DoNotOptimize(z);
   }
-  // cl::sycl::free(z, q);
-  cl::sycl::free(x, q);
-  cl::sycl::free(y, q);
+  cl::sycl::free(x, queue);
+  cl::sycl::free(y, queue);
 
   int num_bytes = sizeof(T);
   state.SetItemsProcessed(3 * num_bytes * global_size * state.iterations());
