@@ -8,7 +8,7 @@ Requires hipSYCL - https://github.com/illuhad/hipSYCL
 export CXX=clang++
 mkdir build
 cd build
-cmake -DSYCL_IMPL=LLVM -DSYCL_TARGET=cpu ..
+cmake -DSYCL_IMPL=LLVM -DSYCL_TARGET=CPU ..
 make 
 ```
 
@@ -31,10 +31,10 @@ Instructions to install Intel's LLVM-Based SYCL can be found [here](https://inte
 ### CPUs
 
 ```bash
-export HIPSYCL_TARGETS=omp
+export CXX=clang++
 mkdir build
 cd build
-cmake -DSYCL_IMPL=hipSYCL -DSYCL_TARGET=cpu ..
+cmake -DSYCL_IMPL=LLVM -DSYCL_TARGET=CPU ..
 make 
 ```
 
@@ -42,11 +42,11 @@ make
 
 ```bash
 export CUDA_PATH=/path/to/cuda
-export HIPSYCL_TARGETS=cuda:sm_XX
+export CXX=clang++
 mkdir build
 cd build
-cmake -DSYCL_IMPL=hipSYCL -DSYCL_TARGET=GPU ..
-make 
+cmake -DSYCL_IMPL=LLVM -DSYCL_TARGET=GPU ..
+make
 ```
 ---
 ## Running benchmarks
