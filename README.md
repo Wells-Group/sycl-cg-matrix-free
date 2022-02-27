@@ -1,4 +1,4 @@
-# SYCL benchmarks
+# Matrix-free CG SYCL benchmarks
 
 ## Building with hiPSYCL
 Requires hipSYCL - https://github.com/illuhad/hipSYCL
