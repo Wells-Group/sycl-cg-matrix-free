@@ -36,7 +36,7 @@ auto init_vector(sycl::queue queue, std::size_t n, T value) {
 }
 //-------------------------------------------------------------------------//
 template <typename T>
-sycl::event axpy(sycl::queue q, std::size_t n, T alpha, T beta,
+sycl::event axpby(sycl::queue q, std::size_t n, T alpha, T beta,
                  const T *__restrict x, T *__restrict y, std::size_t wgs = 512,
                  const std::vector<sycl::event> &events = {}) {
 

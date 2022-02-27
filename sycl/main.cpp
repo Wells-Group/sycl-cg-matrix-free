@@ -10,10 +10,8 @@ constexpr double value = 1. / 3.;
 using namespace cl;
 using namespace std::chrono;
 
-template <typename T> static void bench_axpy(benchmark::State &state) {
-
+template <typename T> static void bench_axpby(benchmark::State &state) {
   cl::sycl::queue queue{sycl::default_selector()};
-
   const std::size_t work_group_size = state.range(0);
   const std::size_t global_size = state.range(1);
 
@@ -24,7 +22,7 @@ template <typename T> static void bench_axpy(benchmark::State &state) {
 
   for (auto _ : state) {
     auto start = high_resolution_clock::now();
-    kernel::axpy(queue, global_size, alpha, beta, x, y, work_group_size).wait();
+    kernel::axpby(queue, global_size, alpha, beta, x, y, work_group_size).wait();
     auto end = high_resolution_clock::now();
     double t = duration_cast<duration<double>>(end - start).count();
     state.SetIterationTime(t);
@@ -110,7 +108,7 @@ template <typename T> static void bench_axpy(benchmark::State &state) {
 //   state.SetLabel(impl);
 // }
 
-/// Arguments for axpy
+/// Arguments for axpby
 static void custom_arguments(benchmark::internal::Benchmark *b) {
   std::vector<std::int64_t> work_group_sizes = {16, 32, 64, 128};
   const std::int64_t max_size = 1024 * 1024 * 1024;
@@ -121,7 +119,7 @@ static void custom_arguments(benchmark::internal::Benchmark *b) {
 }
 
 // Register axpby benchmarks
-BENCHMARK_TEMPLATE(bench_axpy, double)
+BENCHMARK_TEMPLATE(bench_axpby, double)
     ->Apply(custom_arguments)
     ->UseManualTime()
     ->Iterations(10);
@@ -140,6 +138,9 @@ BENCHMARK_TEMPLATE(bench_axpy, double)
 
 // Run benchmarks
 int main(int argc, char **argv) {
+#ifdef TARGET_GPU
+  std::cout << "targeting gpus";
+#endif
   ::benchmark::Initialize(&argc, argv);
   if (::benchmark::ReportUnrecognizedArguments(argc, argv))
     return 1;
