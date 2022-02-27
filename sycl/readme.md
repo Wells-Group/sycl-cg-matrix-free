@@ -5,22 +5,22 @@ Requires hipSYCL - https://github.com/illuhad/hipSYCL
 ### CPUs
 
 ```bash
-export CXX=clang++
+export HIPSYCL_TARGETS=omp
 mkdir build
 cd build
-cmake -DSYCL_IMPL=LLVM -DSYCL_TARGET=CPU ..
+cmake -DSYCL_IMPL=hipSYCL -DSYCL_TARGET=cpu ..
 make 
 ```
 
 ### NVIDIA GPUS
 
 ```bash
-export CXX=clang++
+export HIPSYCL_TARGETS=cuda:sm_XX
 export CUDA_PATH=/path/to/cuda
 mkdir build
 cd build
-cmake -DSYCL_IMPL=LLVM -DSYCL_TARGET=GPU ..
-make 
+cmake -DSYCL_IMPL=hipSYCL -DSYCL_TARGET=GPU ..
+make
 ```
 ---
 ## Building with Intel LLVM
