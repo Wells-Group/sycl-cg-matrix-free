@@ -190,5 +190,38 @@ auto cg_update(sycl::queue &queue, std::size_t n, T alpha, const T *p,
   sycl::host_accessor sum_host{sum};
   return sum_host[0];
 }
+//-------------------------------------------------------------------------//
+/// Computes the vector dot product.
+/// alpha += x[i] * y[i]
+/// Note: This function returns synchronously
+/// nd range parallel for loop variant.
+template <typename T>
+auto dot_group(sycl::queue &queue, std::size_t n, const T *x, const T *y,
+               std::size_t wgs, std::size_t bs,
+               const std::vector<sycl::event> &events = {}) {
+  sycl::nd_range range = get_execution_range(n, wgs, bs);
+  T *d_sum = cl::sycl::malloc_shared<T>(n, queue);
+
+  queue.submit([&](sycl::handler &h) {
+    h.depends_on(events);
+    h.parallel_for(range, [=](sycl::nd_item<1> it) {
+      std::size_t idx = it.get_global_id(0);
+      std::size_t size = it.get_global_range(0);
+      T t_sum = 0;
+      for (std::size_t i = idx; i < n; i += size)
+        t_sum += x[i] * y[i];
+
+      T g_sum = sycl::reduce_over_group(it.get_group(), t_sum, std::plus<T>());
+      if (it.get_local_id(0) == 0) {
+        sycl::atomic_ref<T, sycl::memory_order::relaxed,
+                         sycl::memory_scope::system,
+                         sycl::access::address_space::global_space>(*d_sum) +=
+            g_sum;
+      }
+    }); // End of the kernel function
+  });   // End of command group
+  queue.wait();
+  return d_sum[0];
+}
 
 } // namespace kernel
